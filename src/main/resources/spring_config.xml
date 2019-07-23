@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+    <!-- 读取db.properties中的变量 值，db.properties要放在classpath根目录下 -->
+    <context:property-placeholder location="classpath:/jdbc.properties" />
+
+    <!--定义组件扫描器-->
+    <context:component-scan base-package="top.aweiwei.www.service"></context:component-scan>
+    <context:component-scan base-package="top.aweiwei.www.interceptor"></context:component-scan>
+    <context:component-scan base-package="top.aweiwei.www.utils"></context:component-scan>
+    <!-- 描述一个数据源,BasicDataSource,c3p0,阿里巴巴 -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${jdbc.driver}" />
+        <property name="url" value="${jdbc.url}" />
+        <property name="username" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
+
+    </bean>
+
+
+    <!--mybatis  sessionFactory配置-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--注入数据库连接池-->
+        <property name="dataSource" ref="dataSource"/>
+        <!-- 扫描 sql 配置⽂件:mapper 需要的 xml ⽂件 -->
+        <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+        <!-- 配置 MyBatis 全局配置⽂件:mybatis-config.xml -->
+        <property name="configLocation" value="classpath:/mybatis-config.xml"/>
+    </bean>
+
+    <!-- 自动扫描mybatis定义的mapper类  ，spring扫描到这些mapper类之后，就会向spring容器注册这些dao类对象-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 注⼊ sqlSessionFactory -->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <!-- 给出需要扫描 dao 接⼝包 -->
+        <property name="basePackage"  value="top.aweiwei.www.mapper"/>
+    </bean>
+
+    <!--  事务配置   -->
+    <!-- 声明事务管理器 -->
+    <bean name="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+
+    <!-- 表示启用注解事务 -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+    <!--
+    事务配置
+    2)	常见事务属性：
+	REQUIRED :支持当前的事务，如果不存在就创建一个新的。这是最常用的选择。
+	SUPPORTS :支持当前的事务，如果不存在就不使用事务。
+	MANDATORY :支持当前的事务，如果不存在就抛出异常。
+	REQUIRES_NEW :创建一个新的事务，并暂停当前的事务（如果存在）。
+	NOT_SUPPORTED :不使用事务，并暂停当前的事务（如果存在）。
+	NEVER :不使用事务，如果当前存在事务就抛出异常。
+	NESTED:如果当前存在事务就作为嵌入事务执行，否则与PROPAGATION_REQUIRED类似。
+	readOnly：表示该方法是只读的，而不能更新数据库里的数据
+
+     -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="del*" propagation="REQUIRED" rollback-for="java.lang.Exception" no-rollback-for="java.lang.RuntimeException"/>
+            <tx:method name="update*" propagation="REQUIRED" rollback-for="java.lang.Exception" no-rollback-for="java.lang.RuntimeException"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!-- 配置使用事务的类和方法的集合
+
+    <aop:config>
+        <aop:pointcut id="pc"
+                      expression="execution(public * net.togogo.mvcweb162.service..*(..))" />
+        <aop:advisor pointcut-ref="pc" advice-ref="txAdvice" />
+    </aop:config>
+    -->
+</beans>

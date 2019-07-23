@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+    <!-- 必须要加上这一行代码，spring会把base-package包下面的类当成控制器来处理 -->
+    <context:component-scan base-package="top.aweiwei.www.controller"/>
+
+    <!-- 配置注解驱动 -->
+    <mvc:annotation-driven></mvc:annotation-driven>
+
+    <!--/css/login.css,location的路径是指在项目目录中从webapp下开始的路径。/**代表匹配多级目录下的所有文件-->
+    <mvc:resources mapping="/admin/**" location="/static/admin/"></mvc:resources>
+    <mvc:resources mapping="/user/**" location="/static/user/"></mvc:resources>
+    <mvc:resources mapping="/upload/**" location="/static/admin/upload/"></mvc:resources>
+
+    <!-- 视图解析器,这是jsp的ViewResolver，项目用的Thymeleaf-->
+   <!-- <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/" />
+        <property name="suffix" value=".html" />
+    </bean>
+        -->
+
+    <!-- thymeleaf视图解析器-->
+    <bean id="templateResolver"
+          class="org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver">
+        <property name="prefix" value="/WEB-INF/"/>
+        <property name="suffix" value=".html"/>
+        <property name="characterEncoding" value="UTF-8"/>
+        <property name="order" value="1"/>
+        <property name="templateMode" value="HTML5"/>
+        <property name="cacheable" value="false"/>
+    </bean>
+
+    <bean id="templateEngine"
+          class="org.thymeleaf.spring4.SpringTemplateEngine">
+        <property name="templateResolver" ref="templateResolver"/>
+    </bean>
+
+    <bean id="viewResolver" class="org.thymeleaf.spring4.view.ThymeleafViewResolver">
+        <property name="templateEngine" ref="templateEngine"/>
+        <property name="characterEncoding" value="UTF-8"/>
+    </bean>
+
+    <!-- SpringMVC上传文件时，需要配置MultipartResolver处理器 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding" value="UTF-8" />
+        <!-- 指定所上传文件的总大小不能超过200KB。注意maxUploadSize属性的限制不是针对单个文件，而是所有文件的容量之和 -->
+        <!-- <property name="maxUploadSize" value="200000"/> -->
+        <!-- 指定上传文件的临时路径 -->
+        <!-- <property name="uploadTempDir" value="uploadTempDirectory" /> -->
+    </bean>
+
+    <!--静态资源默认servlet配置
+            (1)加⼊对静态资源的处理： js,gif,png
+            (2)允许使⽤"/"做整体映射
+        -->
+    <mvc:default-servlet-handler/>
+    <!--&lt;!&ndash; 配置返回json数据 &ndash;&gt;-->
+    <!--&lt;!&ndash;配置handlerAdaptor&ndash;&gt;-->
+    <!--<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"-->
+          <!--p:ignoreDefaultModelOnRedirect="true">-->
+        <!--<property name="messageConverters">-->
+            <!--<list>-->
+                <!--&lt;!&ndash;配置转换器&ndash;&gt;-->
+                <!--<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"></bean>-->
+            <!--</list>-->
+        <!--</property>-->
+    <!--</bean>-->
+    
+       <!--拦截器配置-->
+    <!--"/**"全局拦截后面的**不能少-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/admin/**"/>
+            <bean class="top.aweiwei.www.interceptor.BaseInterceptor"/>
+        </mvc:interceptor>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="top.aweiwei.www.interceptor.CommonInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+</beans>
