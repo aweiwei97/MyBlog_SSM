@@ -53,7 +53,7 @@ public class LogServiceImpl implements ILogService {
         }
         LogVoExample logVoExample = new LogVoExample();
         logVoExample.setOrderByClause("id desc");
-        PageHelper.startPage((page - 1) * limit, limit);
+        PageHelper.startPage(page, limit);
         List<LogVo> logVos = logDao.selectByExample(logVoExample);
         LOGGER.debug("Exit getLogs method");
         return logVos;

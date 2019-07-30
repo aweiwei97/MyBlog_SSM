@@ -7,8 +7,13 @@
         <setting name="useGeneratedKeys" value="true" />
         <!-- 使⽤列别名替换列名 默认:true -->
         <setting name="useColumnLabel" value="true" />
+        <!-- 二级缓存开启 -->
         <setting name="cacheEnabled" value="true"/>
+        <!-- 当启用时，有延迟加载属性的对象在被调用时将会完全加载任意属性。否则，每种属性将会按需要加载 -->
+        <setting name="aggressiveLazyLoading" value="false"/>
+        <!--log4j打印Sql语句-->
         <setting name="logImpl" value="LOG4J"/>
+
     </settings>
     <!-- 配置分页插件 -->
     <plugins>

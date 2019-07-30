@@ -40,9 +40,10 @@ import java.util.List;
 public class AttachController extends BaseController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AttachController.class);
-
+    //在本地
     public static final String CLASSPATH = TaleUtils.getUplodFilePath()+"src/main/webapp/static/admin";
-
+    //服务器路径
+    //public static final String CLASSPATH = TaleUtils.getCentOSPath();
     @Resource
     private IAttachService attachService;
 
@@ -88,6 +89,7 @@ public class AttachController extends BaseController {
                     //返回文件类型
                     String ftype = TaleUtils.isImage(multipartFile.getInputStream()) ? Types.IMAGE.getType() : Types.FILE.getType();
                     File file = new File(CLASSPATH+fkey);
+                    LOGGER.error(CLASSPATH);
                     try {
                         FileCopyUtils.copy(multipartFile.getInputStream(),new FileOutputStream(file));
                     } catch (IOException e) {

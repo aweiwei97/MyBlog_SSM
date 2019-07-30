@@ -6,6 +6,7 @@ import com.github.pagehelper.PageInfo;
 import com.vdurmont.emoji.EmojiParser;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ClassUtils;
 import top.aweiwei.www.constant.WebConst;
 import top.aweiwei.www.dto.MetaDto;
 import top.aweiwei.www.dto.Types;
@@ -14,6 +15,7 @@ import top.aweiwei.www.entity.Vo.ContentVo;
 import top.aweiwei.www.service.ISiteService;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,6 +52,7 @@ public final class Commons {
     public static boolean is_empty(PageInfo paginator) {
         return paginator == null || (paginator.getList() == null) || (paginator.getList().size() == 0);
     }
+
 
     /**
      * 网站链接

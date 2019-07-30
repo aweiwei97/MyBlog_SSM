@@ -31,6 +31,8 @@ public class ContentVo {
 
     private Boolean allowFeed;
 
+    private Integer likeCount;
+
     private String content;
 
     public Integer getCid() {
@@ -151,6 +153,14 @@ public class ContentVo {
 
     public void setAllowFeed(Boolean allowFeed) {
         this.allowFeed = allowFeed;
+    }
+
+    public Integer getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(Integer likeCount) {
+        this.likeCount = likeCount;
     }
 
     public String getContent() {

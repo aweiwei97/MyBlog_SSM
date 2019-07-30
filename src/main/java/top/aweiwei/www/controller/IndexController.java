@@ -418,5 +418,15 @@ public class IndexController extends BaseController {
         cookie.setSecure(false);
         response.addCookie(cookie);
     }
-
+//点赞数增加
+      @RequestMapping("/article/like")
+        @ResponseBody
+    public Integer increaseLikeCount(HttpServletRequest request){
+          Integer cid = Integer.valueOf(request.getParameter("articleId"));
+          ContentVo contents = contentService.getContents(String.valueOf(cid));
+          int count=contents.getLikeCount();
+          contents.setLikeCount(count+5);
+          contentService.updateArticle(contents);
+        return count+5;
+      }
 }

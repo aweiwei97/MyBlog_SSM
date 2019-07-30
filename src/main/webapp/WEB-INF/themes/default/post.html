@@ -10,7 +10,7 @@
         <div class="post-data">
             <time th:datetime="${commons.fmtdate(article.created)}" itemprop="datePublished" th:text="'发布于 '+ ${commons.fmtdate(article.created)}"></time>
             / <th:block th:utext="${commons.show_categories(article.categories)}"/> / <a href="#comments" th:text="${article.commentsNum ?: 0}+' 条评论'"></a> /
-            <th:block th:text="${article.hits}"/>浏览/ <a href="#"><span class="glyphicon glyphicon-thumbs-up"/></a>
+            <th:block th:text="${article.hits}"/>浏览/ <a href="javascript:;"><span class="favorite"><i class="glyphicon glyphicon-thumbs-up"></i> <i class="likeCount" th:text="${article.likeCount}">0</i> </span></a>
         </div>
     </div>
     <div id="post-content" class="post-content" itemprop="articleBody">
@@ -24,5 +24,32 @@
 </article>
 <div th:replace="themes/default/comments::comments"></div>
 <div th:replace="themes/default/footer::footer"></div>
+<script th:inline="javascript">
+    $(".favorite").click(function(){
+
+        if($.cookie("likeId")!=[[${article.cid}]]){
+            $.ajax({
+                async: false,
+                type:"POST",
+                url:"/article/like",
+                data: {articleId:[[${article.cid}]]},
+                dataType:"text",
+                success:function(data){
+                    $(".likeCount").html(data);
+                    $.cookie(
+                        "likeId",[[${article.cid}]],[[${article.cid}]],
+                        {
+                            expires: 7,"path":"/",
+                        }
+                    );
+                },
+                error:function()
+                {
+                    //alert("获取数据出错!");
+                },
+            });
+        }
+    });
+</script>
 </body>
 </html>

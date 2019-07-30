@@ -8,6 +8,7 @@ import org.commonmark.renderer.html.HtmlRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.util.ClassUtils;
 import top.aweiwei.www.constant.WebConst;
 import top.aweiwei.www.controller.admin.AttachController;
 import top.aweiwei.www.entity.Vo.UserVo;
@@ -21,6 +22,7 @@ import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 import java.awt.*;
 import java.io.*;
+import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.Normalizer;
@@ -149,6 +151,21 @@ public class TaleUtils {
         }
         return properties;
     }
+    /**
+     * 获取在CENTOS上的项目static路径
+     * /usr/java/Tomcat/apache-tomcat-8.5.40/webapps/ROOT/WEB-INF/classes/
+     * @return
+     */
+    public static String getCentOSPath(){
+        String path=null;
+        try {
+            path= ClassUtils.getDefaultClassLoader().getResource("").toURI().getPath();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return path+"../../static/admin";
+    }
+
 
     /**
      * md5加密

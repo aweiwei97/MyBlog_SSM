@@ -5,7 +5,6 @@ import org.apache.ibatis.annotations.Param;
 import top.aweiwei.www.entity.Bo.ArchiveBo;
 import top.aweiwei.www.entity.Vo.ContentVo;
 import top.aweiwei.www.entity.Vo.ContentVoExample;
-
 public interface ContentVoMapper {
     int countByExample(ContentVoExample example);
 

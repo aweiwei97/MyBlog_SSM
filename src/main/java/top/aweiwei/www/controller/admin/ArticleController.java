@@ -105,6 +105,7 @@ public class ArticleController extends BaseController {
         UserVo users = this.user(request);
         contents.setAuthorId(users.getUid());
         contents.setType(Types.ARTICLE.getType());
+        contents.setLikeCount(0);
         if (StringUtils.isBlank(contents.getCategories())) {
             contents.setCategories("默认分类");
         }
