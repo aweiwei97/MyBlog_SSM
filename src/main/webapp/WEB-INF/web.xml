@@ -8,7 +8,7 @@
   <!--Spring MVC 配置 并添加监听-->
   <context-param>
     <param-name>contextConfigLocation</param-name>
-    <param-value>classpath:spring_config.xml</param-value>
+    <param-value>classpath:spring_*.xml</param-value>
   </context-param>
 
     <!-- log4j 配置 -->

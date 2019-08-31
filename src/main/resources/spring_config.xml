@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
-       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"  xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
 	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
-	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
-	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+	 http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
 
     <!-- 读取db.properties中的变量 值，db.properties要放在classpath根目录下 -->
-    <context:property-placeholder location="classpath:/jdbc.properties" />
+    <context:property-placeholder location="classpath:/jdbc.properties,classpath:/redis.properties" />
 
     <!--定义组件扫描器-->
     <context:component-scan base-package="top.aweiwei.www.service"></context:component-scan>
@@ -23,7 +21,6 @@
         <property name="password" value="${jdbc.password}" />
 
     </bean>
-
 
     <!--mybatis  sessionFactory配置-->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
@@ -81,4 +78,9 @@
         <aop:advisor pointcut-ref="pc" advice-ref="txAdvice" />
     </aop:config>
     -->
+
+
+
+
+
 </beans>

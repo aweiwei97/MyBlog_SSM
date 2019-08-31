@@ -5,6 +5,8 @@ import com.github.pagehelper.PageInfo;
 import top.aweiwei.www.entity.Vo.ContentVo;
 import top.aweiwei.www.entity.Vo.ContentVoExample;
 
+import java.util.List;
+
 /**
  *Created by aweiwei on 2019/7/20
  */
@@ -91,4 +93,6 @@ public interface IContentService {
      * @param newCatefory
      */
     void updateCategory(String ordinal, String newCatefory);
+
+    List<ContentVo> RedisTank(String key, int start, int end);
 }

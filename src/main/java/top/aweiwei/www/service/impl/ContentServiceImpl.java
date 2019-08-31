@@ -1,5 +1,6 @@
 package top.aweiwei.www.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 
@@ -7,6 +8,7 @@ import com.vdurmont.emoji.EmojiParser;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import top.aweiwei.www.constant.WebConst;
 import top.aweiwei.www.dto.Types;
@@ -19,11 +21,15 @@ import top.aweiwei.www.service.IContentService;
 import top.aweiwei.www.service.IMetaService;
 import top.aweiwei.www.service.IRelationshipService;
 import top.aweiwei.www.utils.DateKit;
+import top.aweiwei.www.utils.RedisUtil;
 import top.aweiwei.www.utils.TaleUtils;
 import top.aweiwei.www.utils.Tools;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by aweiwei on 2019/7/20
@@ -31,6 +37,11 @@ import java.util.List;
 @Service
 public class ContentServiceImpl implements IContentService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ContentServiceImpl.class);
+
+    @Autowired
+    private RedisUtil redisUtil;
+
+    public static final String SCORE_RANK = "score_rank";
 
     @Resource
     private ContentVoMapper contentDao;
@@ -109,6 +120,11 @@ public class ContentServiceImpl implements IContentService {
         return pageInfo;
     }
 
+    /**
+     * 获取文章
+     * @param id id
+     * @return
+     */
     @Override
     public ContentVo getContents(String id) {
         if (StringUtils.isNotBlank(id)) {   //判断某字符串是否非空，等于!isEmpty(String str)
@@ -116,6 +132,14 @@ public class ContentServiceImpl implements IContentService {
                 ContentVo contentVo = contentDao.selectByPrimaryKey(Integer.valueOf(id));
                 if (contentVo != null) {
                     contentVo.setHits(contentVo.getHits() + 1);   //点击数量加1
+
+                    //redis 操作
+                   Long rank= redisUtil.zReverseRank(SCORE_RANK,id);//查找是否添加了元素
+                   if(rank!=null){
+                       redisUtil.zIncrementScore(SCORE_RANK,id,1);//score+1
+                   }else{
+                      Boolean m= redisUtil.zAdd(SCORE_RANK,id,contentVo.getHits()+1);
+                   }
                     contentDao.updateByPrimaryKey(contentVo);
                 }
                 return contentVo;
@@ -125,6 +149,17 @@ public class ContentServiceImpl implements IContentService {
                 List<ContentVo> contentVos = contentDao.selectByExampleWithBLOBs(contentVoExample);
                 if (contentVos.size() != 1) {
                     throw new TipException("query content by id and return is not one");
+                }
+                contentVos.get(0).setHits(contentVos.get(0).getHits() + 1);   //点击数量加1
+                contentDao.updateByPrimaryKey(contentVos.get(0));
+                if(!id.equals("about")) {
+                    //redis 操作
+                    Long rank = redisUtil.zReverseRank(SCORE_RANK, id);//查找是否添加了元素
+                    if (rank != null) {
+                        redisUtil.zIncrementScore(SCORE_RANK, String.valueOf(contentVos.get(0).getCid()), 1);//score+1
+                    } else {
+                        redisUtil.zAdd(SCORE_RANK, String.valueOf(contentVos.get(0).getCid()), contentVos.get(0).getHits());
+                    }
                 }
                 return contentVos.get(0);
             }
@@ -219,5 +254,26 @@ public class ContentServiceImpl implements IContentService {
         relationshipService.deleteById(cid, null);
         metasService.saveMetas(cid, contents.getTags(), Types.TAG.getType());
         metasService.saveMetas(cid, contents.getCategories(), Types.CATEGORY.getType());
+    }
+
+    /**
+     * 获取点击量前三的排行榜
+     * @param key
+     * @param start
+     * @param end
+     * @return
+     */
+    public List<ContentVo> RedisTank(String key,int start,int end){
+        Set<String> range = redisUtil.zReverseRange(key, start, end);
+        List<ContentVo> ContentVos=new ArrayList<>();
+        Iterator<String> iterator=range.iterator();
+        while (iterator.hasNext()){
+            String id=iterator.next();
+            ContentVo contentVo=contentDao.selectByPrimaryKey(Integer.valueOf(id));
+            if(contentVo!=null){
+                ContentVos.add(contentVo);
+            }
+        }
+        return ContentVos;
     }
 }

@@ -84,6 +84,8 @@ public class IndexController extends BaseController {
         if (p > 1) {
             this.title(request, "第" + p + "页");
         }
+        List<ContentVo> contentVos= contentService.RedisTank("score_rank",0,4);
+        request.setAttribute("contentVos",contentVos);
         return this.render("index");  //跳转到继承类的render（）方法
     }
 

@@ -41,9 +41,9 @@ public class AttachController extends BaseController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AttachController.class);
     //在本地
-    public static final String CLASSPATH = TaleUtils.getUplodFilePath()+"src/main/webapp/static/admin";
+   //public static final String CLASSPATH = TaleUtils.getUplodFilePath()+"src/main/webapp/static/admin";
     //服务器路径
-    //public static final String CLASSPATH = TaleUtils.getCentOSPath();
+    public static final String CLASSPATH = TaleUtils.getCentOSPath();
     @Resource
     private IAttachService attachService;
 
