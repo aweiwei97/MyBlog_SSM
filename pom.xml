@@ -47,7 +47,7 @@
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.25</version>
+      <version>8.0.16</version>
     </dependency>
     <!--单独使用DBCP需要2个包：
     commons-dbcp.jar和commons-pool.jar。
